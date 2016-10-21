@@ -1,0 +1,6 @@
+{
+    "extends":"rallycoding",
+     "rules": {
+      "linebreak-style": [2,"windows"]
+    }
+}
