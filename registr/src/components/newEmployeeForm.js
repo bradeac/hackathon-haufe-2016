@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import {
-    Form, InputField,
-    PickerField, DatePickerField
-} from 'react-native-form-generator';
 import { AsyncStorage, Text, Picker } from 'react-native';
 import { Button, Card, CardSection, Spinner, TextBox, Select, DateTime } from './common';
 
