@@ -3,11 +3,17 @@ import {
     View
 } from 'react-native';
 import firebase from 'firebase';
-import { Header, Button, Spinner } from './components/common';
+import { Header, Spinner } from './components/common';
 import LoginForm from './components/loginForm';
 import NewEmployeeForm from './components/newEmployeeForm';
+import EmployeeList from './components/employeeList';
+import ButtonHeader from './components/buttonHeader';
+
 class App extends Component {
-    state = { loggedIn: null }
+    state = {
+        loggedIn: null,
+        currentPage: ''
+    }
 
     componentWillMount() {
         firebase.initializeApp({
@@ -29,17 +35,43 @@ class App extends Component {
 
     renderContent() {
         switch (this.state.loggedIn) {
-            case true: return <NewEmployeeForm />;//(<Button onPress={() => firebase.auth().signOut()}>Log Out</Button>);
+            case true: return this.renderPages();
             case false: return <LoginForm />;
             default: return <Spinner size='large' />;
         }
     }
 
+    renderPages() {
+        switch (this.state.currentPage) {
+            case 'NewEmployee': return (<NewEmployeeForm
+                onNextPage={() => { this.setState({ currentPage: 'EmployeeList' }); }}
+            />);
+            default: return (<EmployeeList
+                onNextPage={() => { this.setState({ currentPage: 'NewEmployee' }); }}
+            />);
+        }
+    }
+
     renderHeader() {
         switch (this.state.loggedIn) {
-            case true: return <Header headerText="Registration form" />;
+            case true: return this.renderPageHeader();
             case false: return <Header headerText="Authentication" />;
             default: return <Header headerText="Initializing" />;
+        }
+    }
+
+    renderPageHeader() {
+        switch (this.state.currentPage) {
+            case 'NewEmployee': return (<ButtonHeader
+                headerText="Registration form"
+                buttonText="X"
+                onPress={() => firebase.auth().signOut()}
+            />);
+            default: return (<ButtonHeader
+                headerText="Pending employees"
+                buttonText="X"
+                onPress={() => firebase.auth().signOut()}
+            />);
         }
     }
 

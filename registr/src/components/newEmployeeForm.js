@@ -5,23 +5,40 @@ import { Button, Card, CardSection, Spinner, TextBox, Select, DateTime } from '.
 const Item = Picker.Item;
 
 class NewEmployeeForm extends Component {
-    state = {
-        firstName: '',
-        lastName: '',
-        gender: '',
-        personalId: '',
-        adress: '',
-        birthday: '2016-10-21',
-        loading: false,
-        error: ''
-    };
+    constructor({ onNextPage }) {
+        super();
+        this.state = {
+            firstName: '',
+            lastName: '',
+            gender: '',
+            personalId: '',
+            adress: '',
+            birthday: '2016-10-21',
+            loading: false,
+            error: '',
+            onNextPage
+        };
+    }
+
 
     onButtonPress() {
         this.setState({ loading: true });
         AsyncStorage.getItem('employees').then((value) => {
-            let employees = [this.state.formData];
-            if (value !== null) {
-                employees = employees.concat(JSON.parse(value));
+            let employees = [];
+            // employees = JSON.parse(value);
+            const employee = {
+                firstName: this.state.firstName,
+                lastName: this.state.lastName,
+                gender: this.state.gender,
+                personalId: this.state.personalId,
+                adress: this.state.adress,
+                birthday: this.state.birthday
+            };
+            if (value === null) {
+                employees.push(employee);
+            } else {
+                employees = JSON.parse(value);
+                employees.push(employee);
             }
             console.log(employees);
             AsyncStorage.setItem('employees', JSON.stringify(employees))
@@ -31,18 +48,7 @@ class NewEmployeeForm extends Component {
     }
 
     onSaveSuccess() {
-        this.setState({
-            firstName: '',
-            lastName: '',
-            gender: '',
-            personalId: '',
-            adress: '',
-            birthday: '2016-10-21',
-            loading: false
-        });
-        AsyncStorage.getItem('employees').then((value2) => {
-            console.log(value2);
-        }).done();
+        this.state.onNextPage();
     }
 
     onSaveFail(error) {
