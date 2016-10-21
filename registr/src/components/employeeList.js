@@ -27,6 +27,9 @@ class EmployeeList extends Component {
         this.state.onNextPage();
     }
 
+    onSubmitPress() {
+        console.log(this.state.employees);
+    }
 
     renderEmployees() {
         return (<Card>{this.state.employees.map(employee =>
@@ -47,6 +50,13 @@ class EmployeeList extends Component {
                     <CardSection>
                         <Button onPress={this.onButtonPress.bind(this)}>
                             Register employee
+                    </Button>
+                    </CardSection>
+                </Card>
+                <Card>
+                    <CardSection>
+                        <Button onPress={this.onSubmitPress.bind(this)}>
+                            Submit employee
                     </Button>
                     </CardSection>
                 </Card>
