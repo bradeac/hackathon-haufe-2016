@@ -3,69 +3,144 @@ import {
     Form, InputField,
     PickerField, DatePickerField
 } from 'react-native-form-generator';
-import { Button, Card, CardSection, TextBox, Spinner } from './common';
+import { AsyncStorage, Text, Picker } from 'react-native';
+import { Button, Card, CardSection, Spinner, TextBox, Select, DateTime } from './common';
+
+const Item = Picker.Item;
 
 class NewEmployeeForm extends Component {
     state = {
-        firstName: '',
-        lastName: '',
-        gender: '',
-        personalId: '',
-        adress: '',
-        birthday: Date
+        formData: {
+            firstName: '',
+            lastName: '',
+            gender: '',
+            personalId: '',
+            adress: '',
+            birthday: '2016-10-21'
+        },
+        loading: false,
+        error: ''
     };
 
-    handleFormChange(formData) {
-        /*
-        formData will contain all the values of the form,
-        in this example.
-     
-        formData = {
-          first_name:"",
-          last_name:"",
-          gender: '',
-          birthday: Date,
-          has_accepted_conditions: bool
-        }
-         */
-
+    onButtonPress() {
+        this.setState({ loading: true });
+        AsyncStorage.getItem('employees').then((value) => {
+            let employees = [this.state.formData];
+            if (value !== null) {
+                employees = employees.concat(JSON.parse(value));
+            }
+            console.log(employees);
+            AsyncStorage.setItem('employees', JSON.stringify(employees))
+                .then(() => {
+                    this.setState({
+                        formData: {
+                            firstName: '',
+                            lastName: '',
+                            gender: '',
+                            personalId: '',
+                            adress: '',
+                            birthday: ''
+                        },
+                        loading: false
+                    });
+                    AsyncStorage.getItem('employees').then((value2) => {
+                        console.log(value2);
+                    }).done();
+                }).catch(error => {
+                    this.setState({
+                        loading: false,
+                        error: `An error occuerd! ${error}`
+                    });
+                });
+        }).done();
     }
+
+    handleFormChange(formData) {
+        this.setState({ formData });
+    }
+
+    renderButton() {
+        if (this.state.loading) {
+            return <Spinner size='small' />;
+        }
+        return (
+            <Button onPress={this.onButtonPress.bind(this)}>
+                Save
+            </Button>
+        );
+    }
+
     render() {
         return (
-
             <Card>
-                <Form
-                    ref='registrationForm'
-                    onFocus={this.handleFormChange.bind(this)}
-                    onChange={this.handleFormChange.bind(this)}
-                    label="Personal Information"
-                    >
-                    <InputField ref='firstName' placeholder='First Name' />
-                    <InputField ref='lastName' placeholder='Last Name' />
-                    <InputField ref='personalId' placeholder='Personal Id' />
-                    <InputField ref='adress' placeholder='Address' />
-                    <PickerField
-                        ref='gender'
-                        placeholder='Gender'
-                        options={{
-                            male: 'Male',
-                            female: 'Female'
-                        }}
-                        />
-                    <DatePickerField
-                        ref='birthday'
-                        minimumDate={new Date('1/1/1900')}
-                        maximumDate={new Date()} mode='date' placeholder='Birth date'
-                        />
-                </Form>
                 <CardSection>
-                    <Button>
-                        Save
-                    </Button>
+                    <TextBox
+                        label={'First name'}
+                        onChangeText={firstName => this.setState({ formData: { firstName } })}
+                        placeholder={'eg. John'}
+                        value={this.state.firstName}
+                    />
+                </CardSection>
+                <CardSection>
+                    <TextBox
+                        label={'Last name'}
+                        onChangeText={lastName => this.setState({ formData: { lastName } })}
+                        placeholder={'eg. Snow'}
+                        value={this.state.lastName}
+                    />
+                </CardSection>
+                <CardSection>
+                    <TextBox
+                        label={'Personal id'}
+                        onChangeText={personalId => this.setState({ formData: { personalId } })}
+                        placeholder={'12345678'}
+                        value={this.state.personalId}
+                    />
+                </CardSection>
+                <CardSection>
+                    <TextBox
+                        label={'Address'}
+                        onChangeText={adress => this.setState({ formData: { adress } })}
+                        placeholder={'str. Address nr. 0'}
+                        value={this.state.adress}
+                    />
+                </CardSection>
+                 <CardSection>
+                    <Select
+                        label={'Gender'}
+                        onValueChange={gender => this.setState({ formData: { gender } })}
+                        value={this.state.gender}
+                    >
+                        <Item label="Male" value="Male" />
+                        <Item label="Female" value="Female" />
+                    </Select>
+                </CardSection>
+                 <CardSection>
+                    <DateTime
+                        label={'Birth date'}
+                        onDateChange={birthday => { this.setState({ formData: { birthday } });
+                        console.log(this.state.formData.birthday);
+                    }}
+                        value={this.state.birthday}
+                    />
+                </CardSection>
+                <Text style={styles.errorStyle}>
+                    {this.state.error}
+                </Text>
+                <CardSection>
+                    {this.renderButton()}
                 </CardSection>
             </Card>
         );
     }
 }
+
+const styles = {
+    errorStyle: {
+        fontSize: 20,
+        alignSelf: 'center',
+        color: 'red'
+    }
+};
 
 export default NewEmployeeForm;
