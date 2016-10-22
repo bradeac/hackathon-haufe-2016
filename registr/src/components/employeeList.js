@@ -29,36 +29,32 @@ class EmployeeList extends Component {
 
     onSubmitPress() {
         const { currentUser } = firebase.auth();
-        var userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
+        const userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
 
-        var val = AsyncStorage.getItem('employees').then(value => 
-        { 
-            var jsonObj = JSON.parse(value); 
+        AsyncStorage.getItem('employees').then(value => {
+            const jsonObj = JSON.parse(value);
 
-            try
-            {
-                for(var i=0; i<jsonObj.length; i++) {
+            try {
+                for (let i = 0; i < jsonObj.length; i++) {
                     console.log(jsonObj[i]);
-                    firebase.database().ref(`user/${ userName }/employees`)
-                        .push({ 'firstName' : jsonObj[i].firstName , 
-                                'lastName' : jsonObj[i].lastName, 
-                                'personalId' : jsonObj[i].personalId, 
-                                'address' : jsonObj[i].address,
-                                'gender' : jsonObj[i].gender,
-                                'birthday' : jsonObj[i].birthday});
+                    firebase.database().ref(`user/${userName}/employees`)
+                        .push({
+                            firstName: jsonObj[i].firstName,
+                            lastName: jsonObj[i].lastName,
+                            personalId: jsonObj[i].personalId,
+                            address: jsonObj[i].address,
+                            gender: jsonObj[i].gender,
+                            birthday: jsonObj[i].birthday
+                        });
                 }
 
                 AsyncStorage.removeItem('employees');
                 this.setState({ employees: [] });
-                
             }
-            catch (err)
-            {
-                console.log('Error while pushing data: ' + err);   
+            catch (err) {
+                console.log(`Error while pushing data: ${err}`);
             }
-
         });
-        
     }
 
     renderButton() {
@@ -98,9 +94,9 @@ class EmployeeList extends Component {
                     </Button>
                     </CardSection>
                 </Card>
-                    
+
                 {this.renderButton()}
-                
+
             </ScrollView>
         );
     }
