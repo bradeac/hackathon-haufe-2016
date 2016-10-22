@@ -16,46 +16,65 @@ class NewEmployeeForm extends Component {
             birthday: '2016-10-21',
             loading: false,
             error: '',
-            onNextPage
+            onNextPage,
+            inputBorder: '#eded'
         };
     }
 
-
     onButtonPress() {
-        this.setState({ loading: true });
-        AsyncStorage.getItem('employees').then((value) => {
-            let employees = [];
-            // employees = JSON.parse(value);
-            const employee = {
-                firstName: this.state.firstName,
-                lastName: this.state.lastName,
-                gender: this.state.gender,
-                personalId: this.state.personalId,
-                adress: this.state.adress,
-                birthday: this.state.birthday
-            };
-            if (value === null) {
-                employees.push(employee);
-            } else {
-                employees = JSON.parse(value);
-                employees.push(employee);
-            }
-            console.log(employees);
-            AsyncStorage.setItem('employees', JSON.stringify(employees))
-                .then(this.onSaveSuccess.bind(this))
-                .catch(this.onSaveFail.bind(this));
-        }).done();
+        if (this.validateFields()) {
+            this.setState({ loading: true });
+            AsyncStorage.getItem('employees').then((value) => {
+                let employees = [];
+                const employee = {
+                    firstName: this.state.firstName,
+                    lastName: this.state.lastName,
+                    gender: this.state.gender,
+                    personalId: this.state.personalId,
+                    adress: this.state.adress,
+                    birthday: this.state.birthday
+                };
+                if (value === null) {
+                    employees.push(employee);
+                } else {
+                    employees = JSON.parse(value);
+                    employees.push(employee);
+                }
+                console.log(employees);
+                AsyncStorage.setItem('employees', JSON.stringify(employees))
+                    .then(this.onSaveSuccess.bind(this))
+                    .catch(this.onSaveFail.bind(this));
+            }).done();
+        }
     }
 
     onSaveSuccess() {
         this.state.onNextPage();
     }
 
+    validateFields() {
+        if (this.isEmpty(this.state.firstName) ||
+            this.isEmpty(this.state.lastName) ||
+            this.isEmpty(this.state.gender) ||
+            this.isEmpty(this.state.personalId) ||
+            this.isEmpty(this.state.adress) ||
+            this.isEmpty(this.state.birthday)) {
+            this.setState({
+                error: 'All fields are required'
+            });
+            return false;
+        }
+        return true;
+    }
     onSaveFail(error) {
         this.setState({
             loading: false,
             error: `An error occuerd! ${error}`
         });
+    }
+
+    isEmpty(str) {
+        return (!str || str.length === 0);
     }
 
     handleFormChange(formData) {

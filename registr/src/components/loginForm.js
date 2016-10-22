@@ -9,7 +9,8 @@ class LoginForm extends Component {
         email: '',
         password: '',
         error: '',
-        loading: false
+        loading: false,
+        inputBorder: '#eded'
     };
 
     onButtonPress() {
@@ -22,6 +23,15 @@ class LoginForm extends Component {
                     .then(this.onLoginSuccess.bind(this))
                     .catch(this.onLoginFail.bind(this));
             });
+    }
+
+    onBlur() {
+        console.log('this.state.defaultVal', this.state.email, this.state.error, this.state.loading, this.state.password);
+        if(this.state.email.indexOf(' ') >= 0 && this.state.error.indexOf(' ') >= 0 && this.state.loading.indexOf(' ') >= 0 && this.state.password.indexOf(' ') >= 0) {
+            this.setState({
+                inputBorder: 'blue'
+            });
+        }
     }
 
     onLoginSuccess() {

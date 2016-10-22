@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    View
+    View, NetInfo, AsyncStorage, Alert
 } from 'react-native';
 import firebase from 'firebase';
 import { Header, Spinner } from './components/common';
@@ -31,7 +31,51 @@ class App extends Component {
                 this.setState({ loggedIn: false });
             }
         });
+        
     }
+
+
+    componentDidMount() {
+        const dispatchConnected = isConnected => { this.onConnected(isConnected); };
+
+        NetInfo.isConnected.fetch().then().done(() => {
+            NetInfo.isConnected.addEventListener('change', dispatchConnected);
+        });
+    }
+
+    onConnected(isConnected) {
+        AsyncStorage.getItem('onlinestatuslist').then((value) => {
+            let onlinestatuslist = [];
+            if (value !== null) {
+                onlinestatuslist = JSON.parse(value);
+            }
+            onlinestatuslist.push(isConnected);
+            AsyncStorage.setItem('onlinestatuslist', JSON.stringify(onlinestatuslist))
+                .then(() => { 
+                    Alert.alert(
+            'Alert Title',
+            JSON.stringify(onlinestatuslist),
+            [
+                { text: 'Ask me later', onPress: () => console.log('Ask me later pressed') },
+                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+            ]
+        ); })
+                .catch();
+        }).done();
+    }
+
+    onSaveSuccess() {
+        this.state.onNextPage();
+    }
+
+    onSaveFail(error) {
+        this.setState({
+            loading: false,
+            error: `An error occuerd! ${error}`
+        });
+    }
+
 
     renderContent() {
         switch (this.state.loggedIn) {
@@ -44,11 +88,11 @@ class App extends Component {
     renderPages() {
         switch (this.state.currentPage) {
             case 'NewEmployee': return (<NewEmployeeForm
-                onNextPage={() => { this.setState({ currentPage: 'EmployeeList' }); }}
-            />);
+                onNextPage={() => { this.setState({ currentPage: 'EmployeeList' }); } }
+                />);
             default: return (<EmployeeList
-                onNextPage={() => { this.setState({ currentPage: 'NewEmployee' }); }}
-            />);
+                onNextPage={() => { this.setState({ currentPage: 'NewEmployee' }); } }
+                />);
         }
     }
 
@@ -66,12 +110,12 @@ class App extends Component {
                 headerText="Registration form"
                 buttonText="X"
                 onPress={() => firebase.auth().signOut()}
-            />);
+                />);
             default: return (<ButtonHeader
                 headerText="Pending employees"
                 buttonText="X"
                 onPress={() => firebase.auth().signOut()}
-            />);
+                />);
         }
     }
 
