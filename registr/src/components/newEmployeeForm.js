@@ -10,9 +10,9 @@ class NewEmployeeForm extends Component {
         this.state = {
             firstName: '',
             lastName: '',
-            gender: '',
+            gender: 'Male',
             personalId: '',
-            adress: '',
+            address: '',
             birthday: '2016-10-21',
             loading: false,
             error: '',
@@ -46,6 +46,29 @@ class NewEmployeeForm extends Component {
                     .catch(this.onSaveFail.bind(this));
             }).done();
         }
+        this.setState({ loading: true });
+        AsyncStorage.getItem('employees').then((value) => {
+            let employees = [];
+            // employees = JSON.parse(value);
+            const employee = {
+                firstName: this.state.firstName,
+                lastName: this.state.lastName,
+                gender: this.state.gender,
+                personalId: this.state.personalId,
+                address: this.state.address,
+                birthday: this.state.birthday
+            };
+            if (value === null) {
+                employees.push(employee);
+            } else {
+                employees = JSON.parse(value);
+                employees.push(employee);
+            }
+            console.log(employees);
+            AsyncStorage.setItem('employees', JSON.stringify(employees))
+                .then(this.onSaveSuccess.bind(this))
+                .catch(this.onSaveFail.bind(this));
+        }).done();
     }
 
     onSaveSuccess() {
@@ -122,9 +145,9 @@ class NewEmployeeForm extends Component {
                 <CardSection>
                     <TextBox
                         label={'Address'}
-                        onChangeText={adress => this.setState({ adress })}
+                        onChangeText={address => this.setState({ address })}
                         placeholder={'str. Address nr. 0'}
-                        value={this.state.adress}
+                        value={this.state.address}
                         />
                 </CardSection>
                 <CardSection>

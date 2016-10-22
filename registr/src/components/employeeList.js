@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, AsyncStorage } from 'react-native';
 import { Button, Card, CardSection, ListItem } from './common';
-
+import * as firebase from 'firebase';
 
 class EmployeeList extends Component {
     constructor({ onNextPage }) {
@@ -23,12 +23,57 @@ class EmployeeList extends Component {
         }).done();
     }
 
-    onButtonPress() {
+    onRegisterPress() {
         this.state.onNextPage();
     }
 
     onSubmitPress() {
-        console.log(this.state.employees);
+        const { currentUser } = firebase.auth();
+        var userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
+
+        var val = AsyncStorage.getItem('employees').then(value => 
+        { 
+            var jsonObj = JSON.parse(value); 
+
+            try
+            {
+                for(var i=0; i<jsonObj.length; i++) {
+                    console.log(jsonObj[i]);
+                    firebase.database().ref(`user/${ userName }/employees`)
+                        .push({ 'firstName' : jsonObj[i].firstName , 
+                                'lastName' : jsonObj[i].lastName, 
+                                'personalId' : jsonObj[i].personalId, 
+                                'address' : jsonObj[i].address,
+                                'gender' : jsonObj[i].gender,
+                                'birthday' : jsonObj[i].birthday});
+                }
+
+                AsyncStorage.removeItem('employees');
+                this.setState({ employees: [] });
+                
+            }
+            catch (err)
+            {
+                console.log('Error while pushing data: ' + err);   
+            }
+
+        });
+        
+    }
+
+    renderButton() {
+        if (this.state.employees.length == 0) {
+            return;
+        }
+        return (
+            <Card>
+                <CardSection>
+                    <Button onPress={this.onSubmitPress.bind(this)}>
+                        Submit employee
+                    </Button>
+                </CardSection>
+            </Card>
+        );
     }
 
     renderEmployees() {
@@ -48,18 +93,14 @@ class EmployeeList extends Component {
                 {this.renderEmployees()}
                 <Card>
                     <CardSection>
-                        <Button onPress={this.onButtonPress.bind(this)}>
+                        <Button onPress={this.onRegisterPress.bind(this)}>
                             Register employee
                     </Button>
                     </CardSection>
                 </Card>
-                <Card>
-                    <CardSection>
-                        <Button onPress={this.onSubmitPress.bind(this)}>
-                            Submit employee
-                    </Button>
-                    </CardSection>
-                </Card>
+                    
+                {this.renderButton()}
+                
             </ScrollView>
         );
     }
