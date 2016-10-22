@@ -10,9 +10,9 @@ class NewEmployeeForm extends Component {
         this.state = {
             firstName: '',
             lastName: '',
-            gender: '',
+            gender: 'Male',
             personalId: '',
-            adress: '',
+            address: '',
             birthday: '2016-10-21',
             loading: false,
             error: '',
@@ -31,7 +31,7 @@ class NewEmployeeForm extends Component {
                 lastName: this.state.lastName,
                 gender: this.state.gender,
                 personalId: this.state.personalId,
-                adress: this.state.adress,
+                address: this.state.address,
                 birthday: this.state.birthday
             };
             if (value === null) {
@@ -103,9 +103,9 @@ class NewEmployeeForm extends Component {
                 <CardSection>
                     <TextBox
                         label={'Address'}
-                        onChangeText={adress => this.setState({ adress })}
+                        onChangeText={address => this.setState({ address })}
                         placeholder={'str. Address nr. 0'}
-                        value={this.state.adress}
+                        value={this.state.address}
                         />
                 </CardSection>
                 <CardSection>

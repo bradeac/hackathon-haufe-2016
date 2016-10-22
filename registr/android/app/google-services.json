@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "591286428408",
+    "firebase_url": "https://registr-b9e7c.firebaseio.com",
+    "project_id": "registr-b9e7c",
+    "storage_bucket": "registr-b9e7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591286428408:android:36ad84faaa510931",
+        "android_client_info": {
+          "package_name": "com.registr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "591286428408-d33r6kv9319e9k89u6le4275agiki5bu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsKBzvTlqtvUKFba-qxTSQxv64UR9H3pk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
