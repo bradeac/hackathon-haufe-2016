@@ -30,10 +30,8 @@ class EmployeeList extends Component {
     onSubmitPress() {
         const { currentUser } = firebase.auth();
         const userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
-
         AsyncStorage.getItem('employees').then(value => {
             const jsonObj = JSON.parse(value);
-
             try {
                 for (let i = 0; i < jsonObj.length; i++) {
                     console.log(jsonObj[i]);
@@ -57,8 +55,13 @@ class EmployeeList extends Component {
         });
     }
 
+    onRemovePress() {
+        AsyncStorage.removeItem('employees');
+        this.setState({ employees: [] });
+    }
+
     renderButton() {
-        if (this.state.employees.length == 0) {
+        if (this.state.employees.length === 0) {
             return;
         }
         return (
@@ -66,6 +69,11 @@ class EmployeeList extends Component {
                 <CardSection>
                     <Button onPress={this.onSubmitPress.bind(this)}>
                         Submit employee
+                    </Button>
+                </CardSection>
+                <CardSection>
+                    <Button onPress={this.onRemovePress.bind(this)}>
+                        Remove pending employees
                     </Button>
                 </CardSection>
             </Card>

@@ -31,7 +31,7 @@ class NewEmployeeForm extends Component {
                     lastName: this.state.lastName,
                     gender: this.state.gender,
                     personalId: this.state.personalId,
-                    adress: this.state.adress,
+                    address: this.state.address,
                     birthday: this.state.birthday
                 };
                 if (value === null) {
@@ -46,29 +46,6 @@ class NewEmployeeForm extends Component {
                     .catch(this.onSaveFail.bind(this));
             }).done();
         }
-        this.setState({ loading: true });
-        AsyncStorage.getItem('employees').then((value) => {
-            let employees = [];
-            // employees = JSON.parse(value);
-            const employee = {
-                firstName: this.state.firstName,
-                lastName: this.state.lastName,
-                gender: this.state.gender,
-                personalId: this.state.personalId,
-                address: this.state.address,
-                birthday: this.state.birthday
-            };
-            if (value === null) {
-                employees.push(employee);
-            } else {
-                employees = JSON.parse(value);
-                employees.push(employee);
-            }
-            console.log(employees);
-            AsyncStorage.setItem('employees', JSON.stringify(employees))
-                .then(this.onSaveSuccess.bind(this))
-                .catch(this.onSaveFail.bind(this));
-        }).done();
     }
 
     onSaveSuccess() {
@@ -80,7 +57,7 @@ class NewEmployeeForm extends Component {
             this.isEmpty(this.state.lastName) ||
             this.isEmpty(this.state.gender) ||
             this.isEmpty(this.state.personalId) ||
-            this.isEmpty(this.state.adress) ||
+            this.isEmpty(this.state.address) ||
             this.isEmpty(this.state.birthday)) {
             this.setState({
                 error: 'All fields are required'
