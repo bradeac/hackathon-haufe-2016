@@ -13,7 +13,7 @@ class NewEmployeeForm extends Component {
             gender: 'Male',
             personalId: '',
             address: '',
-            birthday: '2016-10-21',
+            birthday: (new Date()).toISOString().slice(0, 10).replace(/-/g, ''),
             loading: false,
             error: '',
             onNextPage,
