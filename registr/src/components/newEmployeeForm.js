@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Text, Picker } from 'react-native';
-import { Button, Card, CardSection, Spinner, TextBox, Select, DateTime } from './common';
+import { AsyncStorage, Text, Picker, ToastAndroid } from 'react-native';
+import SpeechAndroid from 'react-native-android-voice';
+import {
+    VoiceTextBox,
+    Button,
+    Card,
+    CardSection,
+    Spinner,
+    TextBox,
+    Select,
+    DateTime
+} from './common';
+
 
 const Item = Picker.Item;
 
@@ -19,6 +30,12 @@ class NewEmployeeForm extends Component {
             onNextPage,
             inputBorder: '#eded'
         };
+    }
+
+    async onVoiceButtonPress() {
+        SpeechAndroid.startSpeech('Speak yo', SpeechAndroid.GERMAN)
+        .then(text => { ToastAndroid.show(text, ToastAndroid.LONG); })
+        .catch(error => { ToastAndroid.show(error, ToastAndroid.LONG); });
     }
 
     onButtonPress() {
@@ -52,6 +69,14 @@ class NewEmployeeForm extends Component {
         this.state.onNextPage();
     }
 
+
+    onSaveFail(error) {
+        this.setState({
+            loading: false,
+            error: `An error occuerd! ${error}`
+        });
+    }
+
     validateFields() {
         if (this.isEmpty(this.state.firstName) ||
             this.isEmpty(this.state.lastName) ||
@@ -65,12 +90,6 @@ class NewEmployeeForm extends Component {
             return false;
         }
         return true;
-    }
-    onSaveFail(error) {
-        this.setState({
-            loading: false,
-            error: `An error occuerd! ${error}`
-        });
     }
 
     isEmpty(str) {
@@ -95,6 +114,16 @@ class NewEmployeeForm extends Component {
     render() {
         return (
             <Card>
+                <CardSection>
+                    <VoiceTextBox
+                        label={'First name'}
+                        onChangeText={firstName => this.setState({ firstName })}
+                        placeholder={'eg. John'}
+                        value={this.state.firstName}
+                        onPress={this.onVoiceButtonPress.bind(this)}
+                        />
+                </CardSection>
+
                 <CardSection>
                     <TextBox
                         label={'First name'}

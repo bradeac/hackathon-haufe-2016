@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    View, NetInfo, AsyncStorage, Alert
+    View, NetInfo, AsyncStorage
 } from 'react-native';
 import firebase from 'firebase';
 import { Header, Spinner } from './components/common';
@@ -31,7 +31,6 @@ class App extends Component {
                 this.setState({ loggedIn: false });
             }
         });
-        
     }
 
 
@@ -44,25 +43,32 @@ class App extends Component {
     }
 
     onConnected(isConnected) {
-        AsyncStorage.getItem('onlinestatuslist').then((value) => {
-            let onlinestatuslist = [];
-            if (value !== null) {
-                onlinestatuslist = JSON.parse(value);
-            }
-            onlinestatuslist.push(isConnected);
-            AsyncStorage.setItem('onlinestatuslist', JSON.stringify(onlinestatuslist))
-                .then(() => { 
-                    Alert.alert(
-            'Alert Title',
-            JSON.stringify(onlinestatuslist),
-            [
-                { text: 'Ask me later', onPress: () => console.log('Ask me later pressed') },
-                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'OK', onPress: () => console.log('OK Pressed') },
-            ]
-        ); })
-                .catch();
-        }).done();
+        if (isConnected) {
+            const { currentUser } = firebase.auth();
+            const userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
+            AsyncStorage.getItem('employees').then(value => {
+                const jsonObj = JSON.parse(value);
+                try {
+                    for (let i = 0; i < jsonObj.length; i++) {
+                        console.log(jsonObj[i]);
+                        firebase.database().ref(`user/${userName}/employees`)
+                            .push({
+                                firstName: jsonObj[i].firstName,
+                                lastName: jsonObj[i].lastName,
+                                personalId: jsonObj[i].personalId,
+                                address: jsonObj[i].address,
+                                gender: jsonObj[i].gender,
+                                birthday: jsonObj[i].birthday
+                            });
+                    }
+
+                   EmployeeList.onRemovePress();
+                }
+                catch (err) {
+                    console.log(`Error while pushing data: ${err}`);
+                }
+            });
+        }
     }
 
     onSaveSuccess() {

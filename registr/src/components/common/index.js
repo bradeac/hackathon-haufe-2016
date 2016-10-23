@@ -7,4 +7,4 @@ export * from './spinner';
 export * from './select';
 export * from './datePicker';
 export * from './listItem';
-
+export * from './voiceTextBox';

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { ScrollView, AsyncStorage } from 'react-native';
+import { ScrollView, AsyncStorage, NetInfo, Alert } from 'react-native';
+import firebase from 'firebase';
 import { Button, Card, CardSection, ListItem } from './common';
-import * as firebase from 'firebase';
+
 
 class EmployeeList extends Component {
     constructor({ onNextPage }) {
@@ -28,29 +29,41 @@ class EmployeeList extends Component {
     }
 
     onSubmitPress() {
-        const { currentUser } = firebase.auth();
-        const userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
-        AsyncStorage.getItem('employees').then(value => {
-            const jsonObj = JSON.parse(value);
-            try {
-                for (let i = 0; i < jsonObj.length; i++) {
-                    console.log(jsonObj[i]);
-                    firebase.database().ref(`user/${userName}/employees`)
-                        .push({
-                            firstName: jsonObj[i].firstName,
-                            lastName: jsonObj[i].lastName,
-                            personalId: jsonObj[i].personalId,
-                            address: jsonObj[i].address,
-                            gender: jsonObj[i].gender,
-                            birthday: jsonObj[i].birthday
-                        });
-                }
-
-                AsyncStorage.removeItem('employees');
-                this.setState({ employees: [] });
-            }
-            catch (err) {
-                console.log(`Error while pushing data: ${err}`);
+        NetInfo.isConnected.fetch().then(isConnected => {
+            if (isConnected) {
+                const { currentUser } = firebase.auth();
+                const userName = currentUser.email.substring(0, currentUser.email.indexOf('@'));
+                AsyncStorage.getItem('employees').then(value => {
+                    const jsonObj = JSON.parse(value);
+                    try {
+                        for (let i = 0; i < jsonObj.length; i++) {
+                            console.log(jsonObj[i]);
+                            firebase.database().ref(`user/${userName}/employees`)
+                                .push({
+                                    firstName: jsonObj[i].firstName,
+                                    lastName: jsonObj[i].lastName,
+                                    personalId: jsonObj[i].personalId,
+                                    address: jsonObj[i].address,
+                                    gender: jsonObj[i].gender,
+                                    birthday: jsonObj[i].birthday
+                                });
+                        }
+                        AsyncStorage.removeItem('employees');
+                        this.setState({ employees: [] });
+                    }
+                    catch (err) {
+                        console.log(`Error while pushing data: ${err}`);
+                    }
+                });
+            } else {
+                Alert.alert(
+                    'Connectivity error',
+                    'No internet connection detected. Employees will be submited after a connection is established',
+                    [
+                        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    ]
+                );
             }
         });
     }
@@ -60,7 +73,7 @@ class EmployeeList extends Component {
         this.setState({ employees: [] });
     }
 
-    renderButton() {
+     renderButton() {
         if (this.state.employees.length === 0) {
             return;
         }
